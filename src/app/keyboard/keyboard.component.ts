@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import {KeyMapService} from "../services/data/key-map.service";
+import {Component, OnInit} from '@angular/core';
+import {FetchResultService} from "../services/data/fetch-result.service";
+import {SwipeDetectorService} from "../services/swipe/swipe-detector.service";
 
 @Component({
   selector: 'app-keyboard',
@@ -9,10 +10,14 @@ import {KeyMapService} from "../services/data/key-map.service";
 export class KeyboardComponent implements OnInit {
   touches: any;
   swipeTouches: any;
+  result: any;
+  sentence: string;
 
-  constructor(private keyMapService: KeyMapService) {
+  constructor(private fetchResultService: FetchResultService, private swipeDetectorService: SwipeDetectorService) {
     this.touches = [];
     this.swipeTouches = [];
+    this.result = [];
+    this.sentence = '';
   }
 
   ngOnInit(): void {
@@ -24,42 +29,64 @@ export class KeyboardComponent implements OnInit {
   }
 
   onSwipe($event: TouchEvent) {
+    $event.preventDefault();
     const {touches, timeStamp} = $event;
-    const value = {
-      x: touches[0].clientX,
-      y: touches[0].clientY
-    };
+    const value = {x: touches[0].clientX, y: touches[0].clientY};
     this.swipeTouches.push({value, timeStamp});
   }
 
   onTouchEnd() {
-    // const letter = getCharacter(this.touches);
-    //
-    // if (letter) {
-    //   this.result.push({touches: getFormattedTouches(this.touches), value: 'ADD ' + letter, touchType: 'static'});
-    //   this.sentence += letter;
-    //   this.touches = [];
-    //   this.swipeTouches = [];
-    //   console.log('result:', this.result);
-    // }
-    //
-    // const isSwipedDown = swipeDown(this.swipeTouches);
-    // if (isSwipedDown) {
-    //   this.sentence += ' ';
-    //   this.result.push({touches: getFormattedSwipedTouches(this.swipeTouches), value: 'ADD ' + 'SPACE', touchType: 'swipe'});
-    //   console.log('result:', this.result);
-    //   this.touches = [];
-    //   this.swipeTouches = [];
-    // }
-    //
-    // const isSwipedUp = swipeUp(this.swipeTouches);
-    // if (isSwipedUp) {
-    //   const deleteChar = this.sentence[this.sentence.length - 1];
-    //   this.sentence = this.sentence.slice(0, -1);
-    //   this.result.push({touches: getFormattedSwipedTouches(this.swipeTouches), value: 'DELETE ' + deleteChar, touchType: 'swipe'});
-    //   console.log('result:', this.result);
-    //   this.touches = [];
-    //   this.swipeTouches = [];
-    // }
+    const letter = this.fetchResultService.detectLetter(this.touches);
+
+    if (letter) {
+      this.addLetter(letter);
+    }
+
+    const isSwipedDown = this.swipeDetectorService.detectSwipeDown(this.swipeTouches);
+    if (isSwipedDown) {
+      this.addSpace();
+    }
+
+    const isSwipedUp = this.swipeDetectorService.detectSwipeUp(this.swipeTouches);
+    if (isSwipedUp) {
+      this.removeLetter();
+    }
+
+    this.unsetTouches();
+    console.log('result:', this.result);
+  }
+
+  private addLetter(letter: string) {
+    const touchCoordinates = this.fetchResultService.fetchTouchCoordinates(this.touches);
+    const value = 'ADD ' + letter;
+    this.setResult(touchCoordinates, value, 'static');
+
+    this.sentence += letter;
+  }
+
+  private removeLetter() {
+    const removedLetter = this.sentence[this.sentence.length - 1];
+    const swipeTouchCoordinates = this.fetchResultService.fetchSwipeTouchCoordinates(this.swipeTouches);
+    const value = 'DELETE ' + removedLetter;
+    this.setResult(swipeTouchCoordinates, value, 'swipe');
+
+    this.sentence = this.sentence.slice(0, -1);
+  }
+
+  private addSpace() {
+    const swipeTouchCoordinates = this.fetchResultService.fetchSwipeTouchCoordinates(this.swipeTouches);
+    const value = 'ADD SPACE';
+    this.setResult(swipeTouchCoordinates, value, 'swipe');
+
+    this.sentence += ' ';
+  }
+
+  private setResult(touches: any, value: any, touchType: any) {
+    this.result.push({touches, value, touchType});
+  }
+
+  unsetTouches() {
+    this.touches = [];
+    this.swipeTouches = [];
   }
 }
