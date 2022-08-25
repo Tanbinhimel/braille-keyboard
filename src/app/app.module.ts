@@ -5,10 +5,14 @@ import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ResultComponent } from './result/result.component';
+import { KeyboardComponent } from './keyboard/keyboard.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ResultComponent,
+    KeyboardComponent
   ],
   imports: [
     BrowserModule,
