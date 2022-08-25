@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {FetchResultService} from "../services/data/fetch-result.service";
 import {SwipeDetectorService} from "../services/swipe/swipe-detector.service";
 
@@ -8,6 +8,7 @@ import {SwipeDetectorService} from "../services/swipe/swipe-detector.service";
   styleUrls: ['./keyboard.component.scss']
 })
 export class KeyboardComponent implements OnInit {
+  @Output() outputSentenceChangeEvent = new EventEmitter<any>();
   touches: any;
   swipeTouches: any;
   result: any;
@@ -53,6 +54,7 @@ export class KeyboardComponent implements OnInit {
     }
 
     this.unsetTouches();
+    this.outputSentenceChangeEvent.emit(this.sentence);
     console.log('result:', this.result);
   }
 
