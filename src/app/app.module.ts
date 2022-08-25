@@ -7,12 +7,14 @@ import { environment } from '../environments/environment';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ResultComponent } from './result/result.component';
 import { KeyboardComponent } from './keyboard/keyboard.component';
+import { ModalConfirmSendDataComponent } from './modal-confirm-send-data/modal-confirm-send-data.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ResultComponent,
-    KeyboardComponent
+    KeyboardComponent,
+    ModalConfirmSendDataComponent
   ],
   imports: [
     BrowserModule,
