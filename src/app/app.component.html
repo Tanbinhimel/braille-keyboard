@@ -1,8 +1,15 @@
 <div class="container-app">
+  <section class="response" *ngIf="response !== ''">
+    <ngb-toast [autohide]="false" [ngClass]="response==='success' ? 'bg-success': 'bg-danger'">
+      <p
+        class="response-text">{{response === 'success' ? 'Data stored to server successfully!' : 'Something went wrong! please try again later!'}}</p>
+    </ngb-toast>
+  </section>
   <section class="result">
-    <app-result [sentence]="sentence"></app-result>
+    <app-result [sentence]="sentence" [result]="result"
+                (outputResponseEvent)="setOutputResponseEvent($event)"></app-result>
   </section>
   <section class="keyboard">
-    <app-keyboard (outputSentenceChangeEvent)="setOutputSentenceChangeEvent($event)"></app-keyboard>
+    <app-keyboard (outputTouchEndEvent)="setOutputTouchEndEvent($event)"></app-keyboard>
   </section>
 </div>
